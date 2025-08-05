@@ -109,7 +109,7 @@
         formData.append("photo_type", file.type);
 
         try {
-          const response = await fetch("https://script.google.com/macros/s/AKfycbyz-MecIGif54Ox7kd8l2uSZZve6LTx-y9jnWfW3hPq-Iikim1C9hNFUQJL2B4Q7buwuw/exec", {
+          const response = await fetch("YOUR_DEPLOYED_WEBAPP_URL_HERE", {
             method: "POST",
             headers: { "Content-Type": "application/x-www-form-urlencoded" },
             body: formData.toString()
