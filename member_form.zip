@@ -1,0 +1,129 @@
+
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <title>ระบบบันทึกข้อมูลสมาชิก</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f0f4f8;
+      padding: 20px;
+      max-width: 900px;
+      margin: auto;
+    }
+    h1 {
+      text-align: center;
+      color: #2c3e50;
+      border-bottom: 2px solid #3498db;
+      padding-bottom: 10px;
+      margin-bottom: 30px;
+    }
+    label {
+      display: block;
+      margin-top: 10px;
+      color: #34495e;
+      font-weight: bold;
+    }
+    input, select {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    button {
+      padding: 12px 24px;
+      margin-top: 20px;
+      background-color: #3498db;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    button:hover {
+      background-color: #2980b9;
+    }
+    #status {
+      margin-top: 20px;
+      font-weight: bold;
+      color: #27ae60;
+    }
+  </style>
+</head>
+<body>
+  <h1>📋 ระบบบันทึกข้อมูลสมาชิก</h1>
+  <p id="datetime"></p>
+  <form id="dataForm">
+    <label>รหัสสมาชิก <input name="member_id" required></label>
+    <label>วันที่กรอก <input name="entry_date" type="date" required></label>
+    <label>ชื่อ <input name="firstname" required></label>
+    <label>นามสกุล <input name="lastname" required></label>
+    <label>ชื่อเล่น <input name="nickname"></label>
+    <label>วันเกิด <input name="birthdate" type="date"></label>
+    <label>โทรศัพท์ <input name="phone"></label>
+    <label>Email <input name="email" type="email"></label>
+    <label>บ้านเลขที่ <input name="house_no"></label>
+    <label>หมู่ <input name="moo"></label>
+    <label>ตรอก <input name="alley"></label>
+    <label>ซอย <input name="soi"></label>
+    <label>ถนน <input name="road"></label>
+    <label>ตำบล/แขวง <input name="subdistrict"></label>
+    <label>อำเภอ/เขต <input name="district"></label>
+    <label>จังหวัด <input name="province"></label>
+    <label>รหัสไปรษณีย์ <input name="zipcode"></label>
+    <label>รหัสนักศึกษา <input name="student_id"></label>
+    <label>สาขาวิชา <input name="major"></label>
+    <label>คณะ <input name="faculty"></label>
+    <label>มหาวิทยาลัย <input name="university"></label>
+    <label>ภาพถ่ายหน้าตรง <input name="photo" type="file" accept="image/*" required></label>
+    <button type="submit">📩 บันทึกข้อมูล</button>
+  </form>
+  <div id="status"></div>
+
+  <script>
+    document.getElementById("datetime").innerText = new Date().toLocaleString("th-TH", { dateStyle: "full", timeStyle: "medium" });
+
+    document.getElementById("dataForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const status = document.getElementById("status");
+      status.innerText = "⏳ กำลังส่งข้อมูล...";
+
+      const form = e.target;
+      const formData = new URLSearchParams();
+
+      for (const element of form.elements) {
+        if (element.name && element.type !== "file") {
+          formData.append(element.name, element.value);
+        }
+      }
+
+      const fileInput = form.querySelector("input[type='file']");
+      const file = fileInput.files[0];
+      const reader = new FileReader();
+
+      reader.onloadend = async () => {
+        const base64Data = reader.result.split(",")[1];
+        formData.append("photo_base64", base64Data);
+        formData.append("photo_name", file.name);
+        formData.append("photo_type", file.type);
+
+        try {
+          const response = await fetch("https://script.google.com/macros/s/AKfycbyz-MecIGif54Ox7kd8l2uSZZve6LTx-y9jnWfW3hPq-Iikim1C9hNFUQJL2B4Q7buwuw/exec", {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: formData.toString()
+          });
+          const resultText = await response.text();
+          status.innerText = resultText;
+        } catch (error) {
+          status.innerText = "❌ เกิดข้อผิดพลาด: " + error.message;
+        }
+      };
+
+      reader.readAsDataURL(file);
+    });
+  </script>
+</body>
+</html>
